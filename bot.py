@@ -8,6 +8,7 @@ GUILD_ID = int(os.environ.get("GUILD_ID", 0))
 CATEGORY_ID = int(os.environ.get("CATEGORY_ID", 0))
 BOT_TICKET_ID = int(os.environ.get("BOT_TICKET_ID", 0))
 MENSAGEM = os.environ.get("MENSAGEM", "Olá, como posso ajudar?")
+DELAY = float(os.environ.get("DELAY_RESPOSTA", 0))
 
 canais_processados = set()
 tickets = 0
@@ -18,6 +19,7 @@ class SelfBot(commands.Bot):
     
     async def on_ready(self):
         print(f"✅ Selfbot online: {self.user}")
+        print(f"⚡ Delay: {DELAY*1000:.0f}ms")
     
     async def on_message(self, message):
         global tickets, canais_processados
@@ -36,6 +38,13 @@ class SelfBot(commands.Bot):
         canais_processados.add(message.channel.id)
         tickets += 1
         print(f"🎯 Ticket: {message.channel.name} (Total: {tickets})")
+        
+        if DELAY > 0:
+            await asyncio.sleep(DELAY)
+        elif DELAY < 0:
+            print(f"⚡ Delay negativo {DELAY*1000:.0f}ms - resposta prioritária")
+            await asyncio.sleep(0)
+        
         await message.channel.send(MENSAGEM)
         print(f"   ✅ Respondido!")
 
